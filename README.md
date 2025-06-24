@@ -11,3 +11,8 @@ chmod +x destroy.sh
 
 ---
 http://<public-ip>:8081/api/v1
+
+---
+steps to create an EKS cluster
+created  eks-cluster setup
+created iam-role  setup

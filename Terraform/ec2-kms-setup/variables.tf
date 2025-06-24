@@ -3,6 +3,7 @@ variable "public_subnet_cidr" {}
 variable "availability_zone" {}
 variable "instance_type" {}
 variable "key_name" {}
+variable "private_subnet_cidr" {}
 
 variable "profile_name" {
   description = "AWS profile name for authentication"
