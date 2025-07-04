@@ -85,3 +85,23 @@ variable "availability_zone_2" {
 
 # EKS Node Group Variables
 ## Placeholder space you can create if required
+
+variable "coredns_version" {
+  description = "Version of CoreDNS add-on"
+  type        = string
+}
+
+variable "vpc_cni_version" {
+  description = "Version of VPC CNI add-on"
+  type        = string
+}
+
+variable "kube_proxy_version" {
+  description = "Version of kube-proxy add-on"
+  type        = string
+}
+
+variable "ebs_csi_version" {
+  description = "Version of EBS CSI add-on"
+  type        = string
+}

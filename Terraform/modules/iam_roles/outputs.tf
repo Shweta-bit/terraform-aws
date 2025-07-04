@@ -21,3 +21,6 @@ output "amazon_eks_vpc_resource_controller_policy_attachment" {
   value = aws_iam_role_policy_attachment.amazon_eks_vpc_resource_controller_policy_attachment
 }
 
+output "ebs_csi_driver_role_arn" {
+  value = aws_iam_role.ebs_csi_driver.arn
+}

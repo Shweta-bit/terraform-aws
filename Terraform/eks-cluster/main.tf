@@ -132,6 +132,23 @@ resource "aws_eks_node_group" "eks_node_group_private" {
 }
 
 
+module "eks-add-ons" {
+  source = "../modules/eks-add-ons"
+
+  cluster_name      = aws_eks_cluster.eks_cluster.name
+  coredns_version   = var.coredns_version
+  vpc_cni_version   = var.vpc_cni_version
+  kube_proxy_version = var.kube_proxy_version
+  ebs_csi_version   = var.ebs_csi_version
+  ebs_csi_driver_role_arn = module.iam_roles.ebs_csi_driver_role_arn
+
+  depends_on = [
+    module.iam_roles,
+    aws_eks_cluster.eks_cluster,
+    aws_eks_node_group.eks_node_group_public,
+    aws_eks_node_group.eks_node_group_private
+  ]
+}
 
 
 
