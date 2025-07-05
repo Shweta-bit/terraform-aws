@@ -12,11 +12,7 @@ spec:
     helm:
       parameters:
         - name: vpcId
-          value: ${vpc_id}
+          value: vpc-0e3c6b2b9ca88015e
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true

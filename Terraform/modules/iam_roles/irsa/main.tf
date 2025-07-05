@@ -98,7 +98,7 @@ resource "aws_iam_role_policy" "cluster_autoscaler_policy" {
 
 resource "aws_iam_policy" "lb_controller_policy" {
   name   = "AWSLoadBalancerControllerIAMPolicy"
-  policy = file("${path.module}/iam-policy.json")
+  policy = file("${path.module}/iam_policy.json")
 }
 
 resource "aws_iam_role" "lb_controller" {
@@ -123,3 +123,7 @@ resource "aws_iam_role" "lb_controller" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "lb_controller_attachment" {
+  policy_arn = aws_iam_policy.lb_controller_policy.arn
+  role       = aws_iam_role.lb_controller.name
+}
