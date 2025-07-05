@@ -172,4 +172,24 @@ module "eks-add-ons" {
 }
 
 
+data "template_file" "argo_app_lb_controller" {
+  template = file("${path.module}/application-template.yaml")
+
+  vars = {
+    vpc_id = module.network.vpc_id
+  }
+  depends_on = [
+    module.network
+  ]
+}
+
+resource "local_file" "argo_application_yaml" {
+  content  = data.template_file.argo_app_lb_controller.rendered
+  filename = "../argocd-helm/applications/aws-load-balancer-controller.yaml"
+
+  depends_on = [
+    template_file.argo_app
+  ]
+}
+
 

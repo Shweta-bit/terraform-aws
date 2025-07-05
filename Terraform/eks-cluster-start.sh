@@ -105,6 +105,12 @@ kubectl get pods -n kube-system | grep autoscaler
 echo "Waiting for 1 minute before next deployment..."
 sleep 60
 
+echo "Creating service account for aws load balancer controller"
+kubectl create serviceaccount aws-load-balancer-controller -n kube-system
+kubectl annotate serviceaccount -n kube-system aws-load-balancer-controller \
+  eks.amazonaws.com/role-arn=arn:aws:iam::838596245300:role/eks-load-balancer-controller-role
+  
+
 echo "============================"
 echo " Deploying Elasticsearch "
 echo "============================"
