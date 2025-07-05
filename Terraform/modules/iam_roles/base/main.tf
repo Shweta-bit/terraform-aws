@@ -73,46 +73,33 @@ resource "aws_iam_role_policy_attachment" "amazon_ec2_container_registry_readonl
 #   name = "terraform-eks-demo"
 #   role = "${aws_iam_role.eks_nodegroup_role.name}"
 # }
+# resource "aws_iam_openid_connect_provider" "oidc_provider" {
+#   client_id_list = ["sts.amazonaws.com"]
+#   thumbprint_list = ["9e99a48a9960b14926bb7f3b02e22da0c5e9b6d9"] # Default for AWS OIDC
+#   url = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+# }
+
+# resource "aws_iam_role" "ebs_csi_driver" {
+#   name = "eks-cluster-ebs-csi-driver-role"
+
+#   assume_role_policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect    = "Allow"
+#       Principal = {
+#          Federated = aws_iam_openid_connect_provider.oidc_provider.arn
+#       }
+#       Action = "sts:AssumeRoleWithWebIdentity"
+#         Condition = {
+#           "StringEquals" = {
+#             # "${var.oidc_provider_url}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+#             "${replace(aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+#           }
+#         }
+#     }]
+#   })
+# }
 
 
-resource "aws_iam_role" "ebs_csi_driver" {
-  name = "eks-cluster-ebs-csi-driver-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Principal = {
-        Service = "pods.eks.amazonaws.com"
-      }
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
 
-resource "aws_iam_role_policy" "ebs_csi_driver_policy" {
-  name = "ebs-csi-driver-policy"
-  role = aws_iam_role.ebs_csi_driver.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "ec2:CreateVolume",
-          "ec2:AttachVolume",
-          "ec2:DeleteVolume",
-          "ec2:DetachVolume",
-          "ec2:DescribeInstances",
-          "ec2:DescribeVolumes",
-          "ec2:DescribeAvailabilityZones",
-          "ec2:DescribeSnapshots",
-          "ec2:CreateTags",
-          "ec2:DeleteTags"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}

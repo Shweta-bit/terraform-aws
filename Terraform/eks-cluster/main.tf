@@ -20,7 +20,7 @@ module "ec2" {
 }
 
 module "iam_roles" {
-    source         = "../modules/iam_roles"
+    source         = "../modules/iam_roles/base"
     name           = var.name
 }
 
@@ -55,6 +55,24 @@ resource "aws_eks_cluster" "eks_cluster" {
 
   depends_on = [module.iam_roles]
 }
+
+resource "aws_iam_openid_connect_provider" "oidc_provider" {
+  client_id_list = ["sts.amazonaws.com"]
+  thumbprint_list = ["9e99a48a9960b14926bb7f3b02e22da0c5e9b6d9"] # Standard AWS thumbprint
+  url = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+}
+
+
+# Now, OIDC available, pass it to IRSA-specific IAM Roles
+module "iam_roles_irsa" {
+  source           = "../modules/iam_roles/irsa"
+  name             = var.name
+  account_id       = var.account_id
+  oidc_issuer_url  = aws_eks_cluster.eks_cluster.identity[0].oidc[0].issuer
+
+  depends_on = [aws_eks_cluster.eks_cluster]
+}
+
 
 
 data "aws_ssm_parameter" "eks_ami_release_version" {
@@ -132,6 +150,8 @@ resource "aws_eks_node_group" "eks_node_group_private" {
 }
 
 
+
+
 module "eks-add-ons" {
   source = "../modules/eks-add-ons"
 
@@ -140,10 +160,11 @@ module "eks-add-ons" {
   vpc_cni_version   = var.vpc_cni_version
   kube_proxy_version = var.kube_proxy_version
   ebs_csi_version   = var.ebs_csi_version
-  ebs_csi_driver_role_arn = module.iam_roles.ebs_csi_driver_role_arn
+  ebs_csi_driver_role_arn = module.iam_roles_irsa.ebs_csi_driver_role_arn
 
   depends_on = [
     module.iam_roles,
+    module.iam_roles_irsa,
     aws_eks_cluster.eks_cluster,
     aws_eks_node_group.eks_node_group_public,
     aws_eks_node_group.eks_node_group_private

@@ -105,3 +105,5 @@ variable "ebs_csi_version" {
   description = "Version of EBS CSI add-on"
   type        = string
 }
+
+variable "account_id"{}
